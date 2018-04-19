@@ -1,0 +1,282 @@
+Project: Investigating IMDB Data
+Introduction¶I am using the IMDB movie database for this project.  I will upload the csv data from the website into my notebook here, clean up the data, and then explore to find any meaningful observations about the data.In [1]:#First I will import any necessary tools I might need:
+
+import pandas as pd
+#import pandas_datareader.data as data
+import matplotlib
+import numpy as np
+import matplotlib.pyplot as plt
+import plotly.plotly as py
+import pylab
+from plotly.graph_objs import *
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm as cm
+import seaborn as sns; sns.set(color_codes=True),
+sns.set_style('whitegrid')
+%matplotlib inline
+from datetime import datetime as dt
+Data Wrangling¶--Loading and inspecting the dataIn [2]:db = pd.read_csv('moviedata.csv')
+Removing any duplicatesIn [3]:db.drop_duplicates()
+Out[3]:
+
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+ idimdb_idpopularitybudgetrevenueoriginal_titlecasthomepagedirectortagline...overviewruntimegenresproduction_companiesrelease_datevote_countvote_averagerelease_yearbudget_adjrevenue_adj0135397tt036961032.9857631500000001513528810Jurassic WorldChris Pratt|Bryce Dallas Howard|Irrfan Khan|Vi...http://www.jurassicworld.com/Colin TrevorrowThe park is open....Twenty-two years after the events of Jurassic ...124Action|Adventure|Science Fiction|ThrillerUniversal Studios|Amblin Entertainment|Legenda...6/9/201555626.520151.379999e+081.392446e+09176341tt139219028.419936150000000378436354Mad Max: Fury RoadTom Hardy|Charlize Theron|Hugh Keays-Byrne|Nic...http://www.madmaxmovie.com/George MillerWhat a Lovely Day....An apocalyptic story set in the furthest reach...120Action|Adventure|Science Fiction|ThrillerVillage Roadshow Pictures|Kennedy Miller Produ...5/13/201561857.120151.379999e+083.481613e+082262500tt290844613.112507110000000295238201InsurgentShailene Woodley|Theo James|Kate Winslet|Ansel...http://www.thedivergentseries.movie/#insurgentRobert SchwentkeOne Choice Can Destroy You...Beatrice Prior must confront her inner demons ...119Adventure|Science Fiction|ThrillerSummit Entertainment|Mandeville Films|Red Wago...3/18/201524806.320151.012000e+082.716190e+083140607tt248849611.1731042000000002068178225Star Wars: The Force AwakensHarrison Ford|Mark Hamill|Carrie Fisher|Adam D...http://www.starwars.com/films/star-wars-episod...J.J. AbramsEvery generation has a story....Thirty years after defeating the Galactic Empi...136Action|Adventure|Science Fiction|FantasyLucasfilm|Truenorth Productions|Bad Robot12/15/201552927.520151.839999e+081.902723e+094168259tt28208529.3350141900000001506249360Furious 7Vin Diesel|Paul Walker|Jason Statham|Michelle ...http://www.furious7.com/James WanVengeance Hits Home...Deckard Shaw seeks revenge against Dominic Tor...137Action|Crime|ThrillerUniversal Pictures|Original Film|Media Rights ...4/1/201529477.320151.747999e+081.385749e+095281957tt16632029.110700135000000532950503The RevenantLeonardo DiCaprio|Tom Hardy|Will Poulter|Domhn...http://www.foxmovies.com/movies/the-revenantAlejandro GonzÃ¡lez IÃ±Ã¡rritu(n. One who has returned, as if from the dead.)...In the 1820s, a frontiersman, Hugh Glass, sets...156Western|Drama|Adventure|ThrillerRegency Enterprises|Appian Way|CatchPlay|Anony...12/25/201539297.220151.241999e+084.903142e+08687101tt13401388.654359155000000440603537Terminator GenisysArnold Schwarzenegger|Jason Clarke|Emilia Clar...http://www.terminatormovie.com/Alan TaylorReset the future...The year is 2029. John Connor, leader of the r...125Science Fiction|Action|Thriller|AdventureParamount Pictures|Skydance Productions6/23/201525985.820151.425999e+084.053551e+087286217tt36593887.667400108000000595380321The MartianMatt Damon|Jessica Chastain|Kristen Wiig|Jeff ...http://www.foxmovies.com/movies/the-martianRidley ScottBring Him Home...During a manned mission to Mars, Astronaut Mar...141Drama|Adventure|Science FictionTwentieth Century Fox Film Corporation|Scott F...9/30/201545727.620159.935996e+075.477497e+088211672tt22936407.404165740000001156730962MinionsSandra Bullock|Jon Hamm|Michael Keaton|Allison...http://www.minionsmovie.com/Kyle Balda|Pierre CoffinBefore Gru, they had a history of bad bosses...Minions Stuart, Kevin and Bob are recruited by...91Family|Animation|Adventure|ComedyUniversal Pictures|Illumination Entertainment6/17/201528936.520156.807997e+071.064192e+099150540tt20966736.326804175000000853708609Inside OutAmy Poehler|Phyllis Smith|Richard Kind|Bill Ha...http://movies.disney.com/inside-outPete DocterMeet the little voices inside your head....Growing up can be a bumpy road, and it's no ex...94Comedy|Animation|FamilyWalt Disney Pictures|Pixar Animation Studios|W...6/9/201539358.020151.609999e+087.854116e+0810206647tt23797136.200282245000000880674609SpectreDaniel Craig|Christoph Waltz|LÃ©a Seydoux|Ralp...http://www.sonypictures.com/movies/spectre/Sam MendesA Plan No One Escapes...A cryptic message from Bondâ€™s past sends him...148Action|Adventure|CrimeColumbia Pictures|Danjaq|B2410/26/201532546.220152.253999e+088.102203e+081176757tt16176616.189369176000003183987723Jupiter AscendingMila Kunis|Channing Tatum|Sean Bean|Eddie Redm...http://www.jupiterascending.comLana Wachowski|Lilly WachowskiExpand your universe....In a universe where human genetic material is ...124Science Fiction|Fantasy|Action|AdventureVillage Roadshow Pictures|Dune Entertainment|A...2/4/201519375.220151.619199e+081.692686e+0812264660tt04707526.1188471500000036869414Ex MachinaDomhnall Gleeson|Alicia Vikander|Oscar Isaac|S...http://exmachina-movie.com/Alex GarlandThere is nothing more human than the will to s......Caleb, a 26 year old coder at the world's larg...108Drama|Science FictionDNA Films|Universal Pictures International (UP...1/21/201528547.620151.379999e+073.391985e+0713257344tt21201205.98499588000000243637091PixelsAdam Sandler|Michelle Monaghan|Peter Dinklage|...http://www.pixels-movie.com/Chris ColumbusGame On....Video game experts are recruited by the milita...105Action|Comedy|Science FictionColumbia Pictures|Happy Madison Productions7/16/201515755.820158.095996e+072.241460e+081499861tt23954275.9449272800000001405035767Avengers: Age of UltronRobert Downey Jr.|Chris Hemsworth|Mark Ruffalo...http://marvel.com/movies/movie/193/avengers_ag...Joss WhedonA New Age Has Come....When Tony Stark tries to jumpstart a dormant p...141Action|Adventure|Science FictionMarvel Studios|Prime Focus|Revolution Sun Studios4/22/201543047.420152.575999e+081.292632e+0915273248tt34602525.89840044000000155760117The Hateful EightSamuel L. Jackson|Kurt Russell|Jennifer Jason ...http://thehatefuleight.com/Quentin TarantinoNo one comes up here without a damn good reason....Bounty hunters seek shelter from a raging bliz...167Crime|Drama|Mystery|WesternDouble Feature Films|The Weinstein Company|Fil...12/25/201523897.420154.047998e+071.432992e+0816260346tt24460425.74975848000000325771424Taken 3Liam Neeson|Forest Whitaker|Maggie Grace|Famke...http://www.taken3movie.com/Olivier MegatonIt Ends Here...Ex-government operative Bryan Mills finds his ...109Crime|Action|ThrillerTwentieth Century Fox Film Corporation|M6 Film...1/1/201515786.120154.415998e+072.997096e+0817102899tt04789705.573184130000000518602163Ant-ManPaul Rudd|Michael Douglas|Evangeline Lilly|Cor...http://marvel.com/movies/movie/180/ant-manPeyton ReedHeroes Don't Get Any Bigger...Armed with the astonishing ability to shrink i...115Science Fiction|Action|AdventureMarvel Studios7/14/201537797.020151.195999e+084.771138e+0818150689tt16611995.55681895000000542351353CinderellaLily James|Cate Blanchett|Richard Madden|Helen...NaNKenneth BranaghMidnight is just the beginning....When her father unexpectedly passes away, youn...112Romance|Fantasy|Family|DramaWalt Disney Pictures|Genre Films|Beagle Pug Fi...3/12/201514956.820158.739996e+074.989630e+0819131634tt19512665.476958160000000650523427The Hunger Games: Mockingjay - Part 2Jennifer Lawrence|Josh Hutcherson|Liam Hemswor...http://www.thehungergames.movie/Francis LawrenceThe fire will burn forever....With the nation of Panem in a full scale war, ...136War|Adventure|Science FictionStudio Babelsberg|StudioCanal|Lionsgate|Walt D...11/18/201523806.520151.471999e+085.984813e+0820158852tt19644185.462138190000000209035668TomorrowlandBritt Robertson|George Clooney|Raffey Cassidy|...http://movies.disney.com/tomorrowlandBrad BirdImagine a world where nothing is impossible....Bound by a shared destiny, a bright, optimisti...130Action|Family|Science Fiction|Adventure|MysteryWalt Disney Pictures|Babieka|A1135/19/201518996.220151.747999e+081.923127e+0821307081tt17986845.3370643000000091709827SouthpawJake Gyllenhaal|Rachel McAdams|Forest Whitaker...NaNAntoine FuquaBelieve in Hope....Billy "The Great" Hope, the reigning junior mi...123Action|DramaEscape Artists|Riche-Ludwig Productions6/15/201513867.320152.759999e+078.437300e+0722254128tt21263554.907832110000000470490832San AndreasDwayne Johnson|Alexandra Daddario|Carla Gugino...http://www.sanandreasmovie.com/Brad PeytonA rescue pilot survived an earthquake, this is......In the aftermath of a massive earthquake in Ca...114Action|Drama|ThrillerNew Line Cinema|Village Roadshow Pictures|Warn...5/27/201520606.120151.012000e+084.328514e+0823216015tt23224414.71040240000000569651467Fifty Shades of GreyDakota Johnson|Jamie Dornan|Jennifer Ehle|Eloi...https://www.facebook.com/fiftyshadesofgreymovieSam Taylor-JohnsonAre you curious?...When college senior Anastasia Steele steps in ...125Drama|RomanceFocus Features|Trigger Street Productions|Mich...2/11/201518655.320153.679998e+075.240791e+0824318846tt15963634.64804628000000133346506The Big ShortChristian Bale|Steve Carell|Ryan Gosling|Brad ...http://www.thebigshortmovie.com/Adam McKayThis is a true story....The men who made millions from a global econom...130Comedy|DramaParamount Pictures|Plan B Entertainment|Regenc...12/11/201515457.320152.575999e+071.226787e+0825177677tt23812494.566713150000000682330139Mission: Impossible - Rogue NationTom Cruise|Jeremy Renner|Simon Pegg|Rebecca Fe...http://www.missionimpossible.comChristopher McQuarrieDesperate Times. Desperate Measures....Ethan and team take on their most impossible m...131ActionParamount Pictures|Skydance Productions|China ...7/23/201523497.120151.379999e+086.277435e+0826214756tt26372764.56454968000000215863606Ted 2Mark Wahlberg|Seth MacFarlane|Amanda Seyfried|...NaNSeth MacFarlaneTed is Coming, Again....Newlywed couple Ted and Tami-Lynn want to have...115ComedyUniversal Pictures|Media Rights Capital|Fuzzy ...6/25/201516666.320156.255997e+071.985944e+0827207703tt28021444.50378981000000403802136Kingsman: The Secret ServiceTaron Egerton|Colin Firth|Samuel L. Jackson|Mi...http://www.kingsmanmovie.com/Matthew VaughnManners maketh man....The story of a super-secret spy organization t...130Crime|Comedy|Action|AdventureTwentieth Century Fox Film Corporation|Marv Fi...1/24/201538337.620157.451997e+073.714978e+0828314365tt18955874.0622932000000088346473SpotlightMark Ruffalo|Michael Keaton|Rachel McAdams|Lie...http://www.spotlightthefilm.comTom McCarthyBreak the story. Break the silence....The true story of how The Boston Globe uncover...128Drama|Thriller|HistoryParticipant Media|Open Road Films|Anonymous Co...11/6/201515597.820151.839999e+078.127872e+0729294254tt40467843.96889161000000311256926Maze Runner: The Scorch TrialsDylan O'Brien|Kaya Scodelario|Thomas Brodie-Sa...http://mazerunnermovies.comWes BallThe Maze Was Just the Beginning....Thomas and his fellow Gladers face their great...132Action|Science Fiction|ThrillerGotham Group|Temple Hill Entertainment|TSG Ent...9/9/201518496.420155.611998e+072.863562e+08..................................................................1083638720tt00611700.23943500Walk Don't RunCary Grant|Samantha Eggar|Jim Hutton|John Stan...NaNCharles WaltersRun, don't walk to see Walk, Don't Run....British industrialist Sir William Rutland - "B...114Comedy|RomanceColumbia Pictures Corporation1/1/1966115.819660.000000e+000.000000e+001083719728tt00601770.29170400The Blue MaxGeorge Peppard|James Mason|Ursula Andress|Jere...NaNJohn GuillerminThere was no quiet on the Western Front!...A young pilot in the German air force of 1918,...156War|Action|Adventure|DramaTwentieth Century Fox Film Corporation6/21/1966125.519660.000000e+000.000000e+001083822383tt00608620.15184500The ProfessionalsBurt Lancaster|Lee Marvin|Robert Ryan|Woody St...NaNRichard BrooksRough, tough and ready....The Professionals is a 1966 American Western f...117Action|Adventure|WesternColumbia Pictures11/1/1966216.019660.000000e+000.000000e+001083913353tt00605500.27613300It's the Great Pumpkin, Charlie BrownChristopher Shea|Sally Dryer|Kathy Steinberg|A...NaNBill MelendezEvery year he rises from the pumpkin patch......This classic "Peanuts" tale focuses on the thu...25Family|AnimationWarner Bros. Home Video10/27/1966497.219660.000000e+000.000000e+001084034388tt00604370.10253000Funeral in BerlinMichael Caine|Paul Hubschmid|Oskar Homolka|Eva...NaNGuy HamiltonNaN...Colonel Stok, a Soviet intelligence officer re...102ThrillerLowndes Productions Limited12/22/1966135.719660.000000e+000.000000e+001084142701tt00622620.264925750000The ShootingWill Hutchins|Millie Perkins|Jack Nicholson|Wa...NaNMonte HellmanSuspenseful desert pursuit in the "High Noon" ......A hired gun seeks to enact revenge on a group ...82WesternProteus Films10/23/1966125.519665.038511e+050.000000e+001084236540tt00611990.25343700Winnie the Pooh and the Honey TreeSterling Holloway|Junius Matthews|Sebastian Ca...NaNWolfgang ReithermanNaN...Christopher Robin's bear attempts to raid a be...25Animation|FamilyNaN1/1/1966127.919660.000000e+000.000000e+001084329710tt00605880.25239900KhartoumCharlton Heston|Laurence Olivier|Richard Johns...NaNBasil Dearden|Eliot ElisofonWhere the Nile divides, the great Cinerama adv......English General Charles George Gordon, a devou...134Adventure|Drama|War|History|ActionJulian Blaustein Productions Ltd.6/9/1966125.819660.000000e+000.000000e+001084423728tt00595570.23609800Our Man FlintJames Coburn|Lee J. Cobb|Gila Golan|Edward Mul...NaNDaniel MannThe ORIGINAL man of mystery!...When scientists use eco-terrorism to impose th...108Adventure|Comedy|Fantasy|Science Fiction20th Century Fox1/16/1966135.619660.000000e+000.000000e+00108455065tt00590140.23087300Carry On CowboySid James|Jim Dale|Angela Douglas|Kenneth Will...NaNGerald ThomasHow the west was lost!...Stodge City is in the grip of the Rumpo Kid an...93Comedy|WesternPeter Rogers Productions3/1/1966155.919660.000000e+000.000000e+001084617102tt00591270.21271600Dracula: Prince of DarknessChristopher Lee|Barbara Shelley|Andrew Keir|Fr...NaNTerence FisherDEAD for Ten Years DRACULA, Prince of Darkness......Whilst vacationing in the Carpathian Mountain,...90HorrorSeven Arts Productions|Hammer Film Productions1/9/1966165.719660.000000e+000.000000e+001084728763tt00605480.03455500Island of TerrorPeter Cushing|Edward Judd|Carole Gray|Eddie By...NaNTerence FisherHow could they stop the devouring death...that......A small island community is overrun with creep...89Science Fiction|HorrorPlanet Film Productions|Protelco6/20/1966135.319660.000000e+000.000000e+00108482161tt00603970.207257511500012000000Fantastic VoyageStephen Boyd|Raquel Welch|Edmond O'Brien|Donal...NaNRichard FleischerA Fantastic and Spectacular Voyage... Through ......The science of miniaturization has been unlock...100Adventure|Science FictionTwentieth Century Fox Film Corporation8/24/1966426.719663.436265e+078.061618e+071084928270tt00604450.20653700GambitMichael Caine|Shirley MacLaine|Herbert Lom|Joh...NaNRonald NeameShirley MacLaine raises Michael Caine!...Harry Dean (Michael Caine) has a perfect plan ...109Action|Comedy|CrimeUniversal Pictures12/16/1966146.119660.000000e+000.000000e+001085026268tt00604900.20247300HarperPaul Newman|Lauren Bacall|Julie Harris|Arthur ...NaNJack SmightHarper takes a case - and the payoff is murder....Harper is a cynical private eye in the best tr...121Action|Drama|Thriller|Crime|MysteryWarner Bros.2/23/1966146.019660.000000e+000.000000e+001085115347tt00601820.34279100Born FreeVirginia McKenna|Bill Travers|Geoffrey Keen|Pe...NaNJames HillFrom The Pages Of The Beloved Best Seller... A......Born Free (1966) is an Open Road Films Ltd./Co...95Adventure|Drama|Action|Family|ForeignHigh Road6/22/1966156.619660.000000e+000.000000e+001085237301tt00601650.22722000A Big Hand for the Little LadyHenry Fonda|Joanne Woodward|Jason Robards|Paul...NaNFielder CookAll the action you can take...all the adventur......A naive traveler in Laredo gets involved in a ...95WesternEden Productions Inc.5/31/1966116.019660.000000e+000.000000e+001085315598tt00600860.16359200AlfieMichael Caine|Shelley Winters|Millicent Martin...NaNLewis GilbertIs any man an Alfie? Ask any girl!...The film tells the story of a young man who le...114Comedy|Drama|RomanceNaN3/29/1966266.219660.000000e+000.000000e+001085431602tt00602320.14640200The ChaseMarlon Brando|Jane Fonda|Robert Redford|E.G. M...NaNArthur PennThe chase is on!...Most everyone in town thinks that Sheriff Cald...135Thriller|Drama|CrimeHorizon Pictures|Columbia Pictures Corporation2/17/1966176.019660.000000e+000.000000e+001085513343tt00592210.1410267000000The Ghost & Mr. ChickenDon Knotts|Joan Staley|Liam Redmond|Dick Sarge...NaNAlan RafkinG-G-GUARANTEED! YOU'LL BE SCARED UNTIL YOU LAU......Luther Heggs aspires to being a reporter for h...90Comedy|Family|Mystery|RomanceUniversal Pictures1/20/1966146.119664.702610e+060.000000e+001085620277tt00611350.14093400The Ugly DachshundDean Jones|Suzanne Pleshette|Charles Ruggles|K...NaNNorman TokarA HAPPY HONEYMOON GOES TO THE DOGS!...When a G......The Garrisons (Dean Jones and Suzanne Pleshett...93Comedy|Drama|FamilyWalt Disney Pictures2/16/1966145.719660.000000e+000.000000e+00108575921tt00607480.13137800Nevada SmithSteve McQueen|Karl Malden|Brian Keith|Arthur K...NaNHenry HathawaySome called him savage- and some called him sa......Nevada Smith is the young son of an Indian mot...128Action|WesternParamount Pictures|Solar Productions|Embassy P...6/10/1966105.919660.000000e+000.000000e+001085831918tt00609210.31782400The Russians Are Coming, The Russians Are ComingCarl Reiner|Eva Marie Saint|Alan Arkin|Brian K...NaNNorman JewisonIT'S A PLOT! ...to make the world die laughing!!...Without hostile intent, a Soviet sub runs agro...126Comedy|WarThe Mirisch Corporation5/25/1966115.519660.000000e+000.000000e+001085920620tt00609550.08907200SecondsRock Hudson|Salome Jens|John Randolph|Will Gee...NaNJohn FrankenheimerNaN...A secret organisation offers wealthy people a ...100Mystery|Science Fiction|Thriller|DramaGibraltar Productions|Joel Productions|John Fr...10/5/1966226.619660.000000e+000.000000e+00108605060tt00602140.08703400Carry On Screaming!Kenneth Williams|Jim Dale|Harry H. Corbett|Joa...NaNGerald ThomasCarry On Screaming with the Hilarious CARRY ON......The sinister Dr Watt has an evil scheme going....87ComedyPeter Rogers Productions|Anglo-Amalgamated Fil...5/20/1966137.019660.000000e+000.000000e+001086121tt00603710.08059800The Endless SummerMichael Hynson|Robert August|Lord 'Tally Ho' B...NaNBruce BrownNaN...The Endless Summer, by Bruce Brown, is one of ...95DocumentaryBruce Brown Films6/15/1966117.419660.000000e+000.000000e+001086220379tt00604720.06554300Grand PrixJames Garner|Eva Marie Saint|Yves Montand|Tosh...NaNJohn FrankenheimerCinerama sweeps YOU into a drama of speed and ......Grand Prix driver Pete Aron is fired by his te...176Action|Adventure|DramaCherokee Productions|Joel Productions|Douglas ...12/21/1966205.719660.000000e+000.000000e+001086339768tt00601610.06514100Beregis AvtomobilyaInnokentiy Smoktunovskiy|Oleg Efremov|Georgi Z...NaNEldar RyazanovNaN...An insurance agent who moonlights as a carthie...94Mystery|ComedyMosfilm1/1/1966116.519660.000000e+000.000000e+001086421449tt00611770.06431700What's Up, Tiger Lily?Tatsuya Mihashi|Akiko Wakabayashi|Mie Hama|Joh...NaNWoody AllenWOODY ALLEN STRIKES BACK!...In comic Woody Allen's film debut, he took the...80Action|ComedyBenedict Pictures Corp.11/2/1966225.419660.000000e+000.000000e+001086522293tt00606660.035919190000Manos: The Hands of FateHarold P. Warren|Tom Neyman|John Reynolds|Dian...NaNHarold P. WarrenIt's Shocking! It's Beyond Your Imagination!...A family gets lost on the road and stumbles up...74HorrorNorm-Iris11/15/1966151.519661.276423e+050.000000e+0010865 rows × 21 columnsIn [4]:db.describe()
+Out[4]:
+
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+ idpopularitybudgetrevenueruntimevote_countvote_averagerelease_yearbudget_adjrevenue_adjcount10866.00000010866.0000001.086600e+041.086600e+0410866.00000010866.00000010866.00000010866.0000001.086600e+041.086600e+04mean66064.1774340.6464411.462570e+073.982332e+07102.070863217.3897485.9749222001.3226581.755104e+075.136436e+07std92130.1365611.0001853.091321e+071.170035e+0831.381405575.6190580.93514212.8129413.430616e+071.446325e+08min5.0000000.0000650.000000e+000.000000e+000.00000010.0000001.5000001960.0000000.000000e+000.000000e+0025%10596.2500000.2075830.000000e+000.000000e+0090.00000017.0000005.4000001995.0000000.000000e+000.000000e+0050%20669.0000000.3838560.000000e+000.000000e+0099.00000038.0000006.0000002006.0000000.000000e+000.000000e+0075%75610.0000000.7138171.500000e+072.400000e+07111.000000145.7500006.6000002011.0000002.085325e+073.369710e+07max417859.00000032.9857634.250000e+082.781506e+09900.0000009767.0000009.2000002015.0000004.250000e+082.827124e+09Removing any missing or 0 values and abnormally high outliers.In [5]:db = db[db['runtime']>0]
+db = db[(db['revenue']) >0 & (db['revenue'] < 2000000000)]
+db = db[(db['budget'])>0 & (db['budget']<4000000000)]
+                            
+In [6]:db.describe()
+Out[6]:
+
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+ idpopularitybudgetrevenueruntimevote_countvote_averagerelease_yearbudget_adjrevenue_adjcount3855.0000003855.0000003.855000e+033.855000e+033855.0000003855.0000003855.000003855.0000003.855000e+033.855000e+03mean39888.7833981.1914003.720183e+071.076589e+08109.215824527.6119336.167862001.2632944.423630e+071.370294e+08std67213.8159551.4750024.220291e+071.765248e+0819.922166879.8683740.7950411.2819894.480403e+072.160944e+08min5.0000000.0011171.000000e+002.000000e+0015.00000010.0000002.200001960.0000009.693980e-012.370705e+0025%6074.0000000.4624481.000000e+071.357645e+0795.00000071.0000005.700001995.0000001.309053e+071.834123e+0750%11322.0000000.7972982.400000e+074.479322e+07106.000000204.0000006.200002004.0000003.001558e+076.171861e+0775%38577.0000001.3682455.000000e+071.241530e+08119.000000580.0000006.700002010.0000006.061307e+071.632401e+08max417859.00000032.9857634.250000e+082.781506e+09338.0000009767.0000008.400002015.0000004.250000e+082.827124e+09In [7]:min_year = db['release_year'].min()
+# maximum range value
+max_year = db['release_year'].max()
+# print the range
+print(min_year, max_year)
+1960 2015
+This data set includes films made between 1960 and 2015.Now, let's look at the different genres.In [8]:genre_details = list(map(str,(db['genres'])))
+genre = []
+for i in genre_details:
+    split_genre = list(map(str, i.split('|')))
+    for j in split_genre:
+        if j not in genre:
+            genre.append(j)
+
+print(genre)
+['Action', 'Adventure', 'Science Fiction', 'Thriller', 'Fantasy', 'Crime', 'Western', 'Drama', 'Family', 'Animation', 'Comedy', 'Mystery', 'Romance', 'War', 'History', 'Music', 'Horror', 'Documentary', 'Foreign', 'TV Movie']
+Let's look at which genre(s) are most popular.In [9]:genre_count = {}
+genre = []
+for i in genre_details:
+    split_genre = list(map(str,i.split('|')))
+    for j in split_genre:
+        if j in genre:
+            genre_count[j] = genre_count[j] + 1
+        else:
+            genre.append(j)
+            genre_count[j] = 1
+genre_series = pd.Series(genre_count)
+genre_series = genre_series.sort_values(ascending = False)
+genre_series.plot(kind='bar',color=['r'], title = 'Movie Genres 1960-2015')
+plt.xlabel('Genre')
+plt.ylabel('# of Films')
+plt.title('Movie Genres 1960-2015')
+plt.show()
+ Drama is overwhelmingly the most popular genre for movie makers.  I wonder if those generate the most revenue.  That would be something else to explore.What determines a movie's success?¶We could look at success in terms of revenue generation, popularity, or voter ratings.I wanted to compare a movie's runtime to its poplarity, rating, and revenue. I found that the popularity numbers were a little ambiguous and not meaningful so I removed those and decided to just focus on the relationship of revenue and voter rating.In [32]:db.plot(x = 'vote_average', y = 'revenue', kind = 'scatter')
+plt.title('Revenue across Voter Rating')
+plt.xlabel('Voter Rating')
+plt.ticklabel_format(useOffset=False, style='plain')
+plt.ylabel('Revenue')
+plt.show()
+ The majority of movies run between 100-200 minutes with relativly the same level of voter rating and revnue with the exception of a few outliers as you can see in the graph.In [28]:db.plot(x = 'runtime', y = 'vote_average', kind = 'scatter')
+plt.title('Voter ratings across Runtime')
+plt.xlabel('runtime')
+plt.ylabel('Vote Average')
+plt.show()
+ Runtime does not appear to have much to do with a movie's voter rating.  The majority of movies run between 100-200 minutes with relativly the same level of voter rating with the exception of a few outliers.I think there is a better way.  I believe budget may be a better determination of sucessful movies so maybe we should dig a little deeper into the budgets.Let's look at the general dispersion of budgets in this dataset.In [20]:budget= db['budget']/1000000
+fig, ax = plt.subplots()
+num_bins =25
+ax.hist(budget,num_bins)
+
+plt.xlabel('Budget Level(in millions)')
+plt.ylabel('# of movies')
+plt.title('Movie budgets 1960-2015')
+ax.ticklabel_format(useOffset=False, style='plain',bins=10)
+plt.tight_layout()
+plt.show()
+ It looks like the majority of films have budgets below 100,000,000 but that doesn't tell us much.  Let's break it down further.I'm going to look at the data set broken down into 3 groups:under $50 million$50-100 million$100 million +In [12]:bud_under_50 = db[db['budget']<50000000]
+budget_over_50 = db[(db['budget'])>50000000 & (db['budget']<100000000)]
+budget_over_100 = db[(db['budget'])>100000000]
+Let's look at the average budget, revenue, and voter rating in each of the groups.In [13]:bud_under_50_mean = bud_under_50['budget'].mean()
+bud_under_50_meanrevenue = bud_under_50['revenue'].mean()
+bud_under_50_meanrating = bud_under_50['vote_average'].mean()
+
+print("The mean budget for movies with a budget under $50 million is:")
+print(bud_under_50_mean)
+
+print("The mean revenue for movies with a budget under $50 million is:")
+print(bud_under_50_meanrevenue)
+
+print("The mean rating for movies with a budget under $50 million is:")
+print(bud_under_50_meanrating)
+
+budget_over_50_mean = budget_over_50['budget'].mean()
+budget_over_50_meanrevenue = budget_over_50['revenue'].mean()
+budget_over_50_meanrating = budget_over_50['vote_average'].mean()
+
+print("The mean budget for movies with a budget over $50 million is:")
+print(budget_over_50_mean)
+
+print("The mean revenue for movies with a budget over $50 million is:")
+print(budget_over_50_meanrevenue)
+
+print("The mean rating for movies with a budget over $50 million is:")
+print(budget_over_50_meanrating)
+
+
+
+budget_over_100_mean = budget_over_100['budget'].mean()
+budget_over_100_meanrevenue = budget_over_100['revenue'].mean()
+budget_over_100_meanrating = budget_over_100['vote_average'].mean()
+
+print("The mean budget for movies with a budget over $100 million is:")
+print(budget_over_100_mean)
+
+print("The mean revenue for movies with a budget over $100 million is:")
+print(budget_over_100_meanrevenue)
+
+print("The mean rating for movies with a budget over $100 million is:")
+print(budget_over_100_meanrating)
+The mean budget for movies with a budget under $50 million is:
+17629655.2429
+The mean revenue for movies with a budget under $50 million is:
+55801502.8917
+The mean rating for movies with a budget under $50 million is:
+6.17223974763
+The mean budget for movies with a budget over $50 million is:
+37201828.2916
+The mean revenue for movies with a budget over $50 million is:
+107658932.67
+The mean rating for movies with a budget over $50 million is:
+6.16785992218
+The mean budget for movies with a budget over $100 million is:
+154783154.136
+The mean revenue for movies with a budget over $100 million is:
+482992996.993
+The mean rating for movies with a budget over $100 million is:
+6.34695340502
+Let's look at budget vs revenue:In [14]:n_groups = 3
+means_budget = (bud_under_50_mean, budget_over_50_mean, budget_over_100_mean)
+means_revenue = (bud_under_50_meanrevenue, budget_over_50_meanrevenue, budget_over_100_meanrevenue)
+ 
+# create plot
+fig, ax = plt.subplots()
+index = np.arange(n_groups)
+bar_width = 0.35
+opacity = 0.8
+ 
+rects1 = plt.bar(index, means_budget, bar_width,
+                 alpha=opacity,
+                 color='b',
+                 label='Budget')
+ 
+rects2 = plt.bar(index + bar_width, means_revenue, bar_width,
+                 alpha=opacity,
+                 color='g',
+                 label='Revenue')
+ 
+plt.xlabel('Budget Level')
+plt.ylabel('Revenue')
+plt.title('Revenue/Budget Comparison')
+plt.xticks(index + bar_width, ('< $50mil', '%50-$100 mil', '> $100 mil'))
+plt.legend()
+ 
+plt.tight_layout()
+plt.show()
+ This shows what I would expect to see.  In general, you would think that the bigger budget films tend to make more since they put more money into advertising and promotion. But I'm sure that is not always the case and some just go over budget and don't see the payoff at the box office.Now let's look at all three together:In [15]:plt.figure(figsize=(100,100))
+ax = plt.figure().gca(projection='3d')
+ax.scatter(db['budget']/1000000, db['vote_average'], db['revenue']/1000000, c = 'g',s=25)
+ax.set_xlabel('Budget(millions)',rotation=45, fontsize=10,linespacing=8)
+ax.set_ylabel('Rating', rotation=45,linespacing=10)
+ax.set_zlabel('Revenue(millions)',rotation=90,fontsize=10,linespacing=10)
+ax.ticklabel_format(useOffset=False, style='plain',fontsize=5)
+plt.tick_params(axis='y', which='major', labelsize=8)
+plt.tick_params(axis='x', which='major', labelsize=8)
+plt.tick_params(axis='z', which='major', labelsize=8)
+plt.tight_layout()
+plt.show()
+<matplotlib.figure.Figure at 0x7f4e35775c88> Lower budgets (under $50 million) seem to have no trend to speak of, revenue is all over the place.  When you look at those with larger budgets (over $50 million and over $100 million), you can see a slight trend upward which is what you would hope.  If I was a movie maker, I would expect that my "big budget" movies would result in more revenue.  But as this data shows is, that's not a given.Lets run the actual correlation numbers on all the data and see how that looks.In [16]:print(db.corr())
+                    id  popularity    budget   revenue   runtime  vote_count  \
+id            1.000000    0.188871 -0.027450 -0.003212 -0.035693    0.111462   
+popularity    0.188871    1.000000  0.446993  0.615556  0.215157    0.780106   
+budget       -0.027450    0.446993  1.000000  0.688548  0.260989    0.556939   
+revenue      -0.003212    0.615556  0.688548  1.000000  0.250398    0.754583   
+runtime      -0.035693    0.215157  0.260989  0.250398  1.000000    0.273842   
+vote_count    0.111462    0.780106  0.556939  0.754583  0.273842    1.000000   
+vote_average -0.001281    0.317924  0.024227  0.227279  0.351909    0.387271   
+release_year  0.489895    0.173179  0.267984  0.139001 -0.112607    0.207073   
+budget_adj   -0.124036    0.399375  0.958518  0.657577  0.334011    0.497988   
+revenue_adj  -0.088288    0.546985  0.533497  0.900892  0.280604    0.654713   
+
+              vote_average  release_year  budget_adj  revenue_adj  
+id               -0.001281      0.489895   -0.124036    -0.088288  
+popularity        0.317924      0.173179    0.399375     0.546985  
+budget            0.024227      0.267984    0.958518     0.533497  
+revenue           0.227279      0.139001    0.657577     0.900892  
+runtime           0.351909     -0.112607    0.334011     0.280604  
+vote_count        0.387271      0.207073    0.497988     0.654713  
+vote_average      1.000000     -0.134493    0.036913     0.266996  
+release_year     -0.134493      1.000000    0.075032    -0.103260  
+budget_adj        0.036913      0.075032    1.000000     0.570466  
+revenue_adj       0.266996     -0.103260    0.570466     1.000000  
+As expected, none of the pairs have high correlation.  Now I'll show a correlation matrix.In [17]:import matplotlib.pyplot as plt
+import pandas
+import numpy
+    
+mov_data = ['id','popularity', 'budget', 'revenue', 'runtime', 'vote_count','vote_average', 'release_year','budget_adj','revenue_adj']
+correlations = db.corr()
+fig = plt.figure()
+ax = fig.add_subplot(111)
+subplotsize=[5.,5.]
+figuresize=[5.,5.]   
+left = 0.5*(1.-subplotsize[0]/figuresize[0])
+right = 1.-left
+bottom = 0.5*(1.-subplotsize[1]/figuresize[1])
+top = 1.-bottom
+fig.subplots_adjust(left=left,right=right,bottom=bottom,top=top)
+cax = ax.matshow(correlations, vmin=-1, vmax=1)
+cmap = cm.get_cmap('jet', 30)
+fig.colorbar(cax)
+ticks = numpy.arange(0,5,1)
+ax.grid(True)
+ax.set_xticks(ticks)
+ax.set_yticks(ticks)
+ax.xaxis.tick_bottom()
+ax.set_xticklabels(mov_data,rotation=25)
+ax.set_yticklabels(mov_data,rotation=25)
+ax.xaxis.set_label_position('bottom')
+plt.title('Correlation of all movies in dataset',fontsize=14)
+plt.tight_layout()
+plt.show()
+ Conclusions¶After cleaning up the data we were were left with 3,855 entries to review.  I went through and dropped any duplicates, zero values or upper outliers.  For example, I filtered out any revenue greater than /2,000,000,000andanybudgetsgreaterthan 2,000,000,000andanybudgetsgreaterthan
+
+4,000,000,000 to make the data a little more manageable and realistic to review.Looking at the limited data(as much of the data was removed due to missing values or abnormal outliers in one or more areas), I could not find any significant correlations between any of the data.  The numbers seem almost completely random as the budget did not appear to have any meaningful affect on revenue, popularity or ratings as a whole except when looking at the big budget movies.  Lower budget films have a slight trend toward being more successful but it seems that only big budget films really see the payoff in revenue generation.Going forward, I believe if we were able to fill in the missing/invalid gaps, further research could be done. Specifically, I would like to dig deeper into the budget ranges and determine if there is a "sweet spot" in regards to ROI on budget.  Also, I think genres could be explored a bit more to determine which of those are most profitable, or if different genres have different budget levels that show to determine successfulness.  Also, there were several missing web sites, it would be interesting to see how much of an impact that has on the sucess of a movie.  Of course this would require looking at only movies in the internet age but going forward, could be an interesting point to explore.Overall, I believe breaking each part of the data into subgroups and then comparing them would return some more interesting insights.  As it stands, we can "sort of" see some trends but nothing concrete to definitively confirm any causation.  There are limitless ways you can try to inspect this data, we only scratched the surface here.
+
+
+
